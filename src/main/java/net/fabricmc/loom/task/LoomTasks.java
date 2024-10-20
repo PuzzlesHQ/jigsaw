@@ -97,7 +97,7 @@ public abstract class LoomTasks implements Runnable {
 			t.setDescription("Builds a jar with all of the dependencies bundled");
 		});
 
-		getTasks().register("buildBundleJar", ShadowJar.class, t -> {
+		getTasks().register("buildMergedBundleJar", ShadowJar.class, t -> {
 			t.setGroup(Constants.TaskGroup.PUZZLE);
 			if (CosmicReachSourceSets.get(getProject()) instanceof CosmicReachSourceSets.Split s) {
 				t.dependsOn(getProject().getTasks().getByName("compileClientJava"));
