@@ -99,13 +99,17 @@ public abstract class LoomTasks implements Runnable {
 
 		getTasks().register("buildMergedBundleJar", ShadowJar.class, t -> {
 			t.setGroup(Constants.TaskGroup.PUZZLE);
+			t.setConfigurations(Collections.singletonList(getProject().getConfigurations().getByName("bundle")));
+
+			// Client
 			if (CosmicReachSourceSets.get(getProject()) instanceof CosmicReachSourceSets.Split s) {
 				t.dependsOn(getProject().getTasks().getByName("compileClientJava"));
 				t.dependsOn(getProject().getTasks().getByName("processClientResources"));
+				t.from(getProject().getTasks().getByName("processClientResources").getOutputs().getFiles());
 			}
+			// Common/Server
 			t.dependsOn(getProject().getTasks().getByName("compileJava"));
 			t.dependsOn(getProject().getTasks().getByName("processResources"));
-			t.setConfigurations(Collections.singletonList(getProject().getConfigurations().getByName("bundle")));
 			t.from(getProject().getTasks().getByName("processResources").getOutputs().getFiles());
 
 			getProject().getExtensions().getByType(SourceSetContainer.class).forEach(c -> {

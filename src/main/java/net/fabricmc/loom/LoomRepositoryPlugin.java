@@ -65,6 +65,18 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 	}
 
+	public void addImplSided(Project project, String dep) {
+		if (project.getConfigurations().findByName("clientCompileOnly") != null) {
+			project.getDependencies().add("clientCompileOnly", dep + ":client");
+			project.getDependencies().add("clientRuntimeOnly", dep + ":client");
+			project.getDependencies().add("compileOnly", dep + ":server");
+			project.getDependencies().add("runtimeOnly", dep + ":server");
+		} else {
+			project.getDependencies().add("compileOnly", dep + ":client");
+			project.getDependencies().add("runtimeOnly", dep + ":client");
+		}
+	}
+
 	public void addImpl(Project project, String dep) {
 		project.getDependencies().add("compileOnly", dep);
 		project.getDependencies().add("runtimeOnly", dep);
@@ -76,7 +88,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		// Puzzle Loader
 		if (project.getProperties().get("puzzle_loader_version") != null) {
 			if (!project.getProperties().get("puzzle_loader_version").toString().contains("development"))
-				addImpl(project, getPuzzleLoader((String) project.getProperties().get("puzzle_loader_version")));
+				addImplSided(project, getPuzzleLoader((String) project.getProperties().get("puzzle_loader_version")));
 		}
 
 		// Puzzle Paradox
@@ -107,7 +119,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			ComparableVersion puzzleVersionString = new ComparableVersion(project.getProperties().get("puzzle_loader_version").toString());
 
 			// Mixins
-			if (puzzleVersionString.compareTo(PUZZLE_VERSION_REFACTOR) > 0)
+			if (puzzleVersionString.compareTo(PUZZLE_VERSION_REFACTOR) > 0 || "2.0.0".equals(project.getProperties().get("puzzle_loader_version").toString()))
 				addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
 			else
 				addImpl(project, "org.spongepowered:mixin:0.8.5");
@@ -121,6 +133,12 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			repo.setName("Fabric");
 			repo.setUrl(MirrorUtil.getFabricRepository(target));
 		});
+
+		repositories.maven(repo -> {
+			repo.setName("Sponge");
+			repo.setUrl("https://repo.spongepowered.org/repository/maven-public/");
+		});
+
 
 		IvyArtifactRepository cosmicArchiveRepo = repositories.ivy(repo -> { // The CR repo
 			repo.setName("CosmicArchive");
