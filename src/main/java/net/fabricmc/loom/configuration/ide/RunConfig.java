@@ -162,7 +162,7 @@ public class RunConfig {
 		String runDir = settings.getRunDir();
 
 		if (runDir == null) {
-			runDir = "run";
+			runDir = settings.getEnvironment().equals("client") ? "run/client" : "run/server";
 		}
 
 		boolean appendProjectPath = settings.getAppendProjectPathToConfigName().get();
