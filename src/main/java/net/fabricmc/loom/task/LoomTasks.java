@@ -95,6 +95,7 @@ public abstract class LoomTasks implements Runnable {
 
 			t.getArchiveVersion().set(t.getArchiveVersion().get()+"-server-bundle");
 			t.setDescription("Builds a jar with all of the dependencies bundled");
+			t.mergeServiceFiles();
 		});
 
 		getTasks().register("buildMergedBundleJar", ShadowJar.class, t -> {
@@ -120,6 +121,7 @@ public abstract class LoomTasks implements Runnable {
 
 			t.getArchiveVersion().set(t.getArchiveVersion().get()+"-merged-bundle");
 			t.setDescription("Builds a jar with all of the dependencies bundled");
+			t.mergeServiceFiles();
 		});
 
 		registerIDETasks();
