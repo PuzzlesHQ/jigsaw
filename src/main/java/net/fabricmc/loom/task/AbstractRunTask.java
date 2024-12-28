@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 
 import net.fabricmc.loom.configuration.ide.RunConfig;
 import net.fabricmc.loom.util.Constants;
-import net.fabricmc.loom.util.gradle.SyncTaskBuildService;
 
 public abstract class AbstractRunTask extends JavaExec {
 	private static final CharsetEncoder ASCII_ENCODER = StandardCharsets.US_ASCII.newEncoder();

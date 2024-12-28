@@ -83,6 +83,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	}
 
 	static ComparableVersion PUZZLE_VERSION_REFACTOR = new ComparableVersion("2.0.0");
+	static ComparableVersion PUZZLE_VERSION_PRE_BUNDLED = new ComparableVersion("2.1.16");
 
 	private void setupProjectDependencies(Project project) {
 		// Puzzle Loader
@@ -102,27 +103,33 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 
 		if (project.getProperties().get("puzzle_loader_version") != null) {
-			if (Objects.equals(project.getProperties().get("puzzle_loader_version").toString(), "development-fabric"))
-				addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
-			else if (Objects.equals(project.getProperties().get("puzzle_loader_version").toString(), "development-sponge"))
-				addImpl(project, "org.spongepowered:mixin:0.8.5");
-
-			// Asm
-			addImpl(project, "org.ow2.asm:asm:9.6");
-			addImpl(project, "org.ow2.asm:asm-tree:9.6");
-			addImpl(project, "org.ow2.asm:asm-util:9.6");
-			addImpl(project, "org.ow2.asm:asm-analysis:9.6");
-			addImpl(project, "org.ow2.asm:asm-commons:9.6");
-
-			if (project.getProperties().get("puzzle_loader_version").toString().contains("development")) return;
-
 			ComparableVersion puzzleVersionString = new ComparableVersion(project.getProperties().get("puzzle_loader_version").toString());
 
-			// Mixins
-			if (puzzleVersionString.compareTo(PUZZLE_VERSION_REFACTOR) > 0 || "2.0.0".equals(project.getProperties().get("puzzle_loader_version").toString()))
-				addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
-			else
-				addImpl(project, "org.spongepowered:mixin:0.8.5");
+			if (
+					!(puzzleVersionString.compareTo(PUZZLE_VERSION_PRE_BUNDLED) > 0
+					|| "2.1.16".equals(project.getProperties().get("puzzle_loader_version").toString()))
+			) {
+				if (Objects.equals(project.getProperties().get("puzzle_loader_version").toString(), "development-fabric"))
+					addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
+				else if (Objects.equals(project.getProperties().get("puzzle_loader_version").toString(), "development-sponge"))
+					addImpl(project, "org.spongepowered:mixin:0.8.5");
+
+				// Asm
+				addImpl(project, "org.ow2.asm:asm:9.6");
+				addImpl(project, "org.ow2.asm:asm-tree:9.6");
+				addImpl(project, "org.ow2.asm:asm-util:9.6");
+				addImpl(project, "org.ow2.asm:asm-analysis:9.6");
+				addImpl(project, "org.ow2.asm:asm-commons:9.6");
+
+				if (project.getProperties().get("puzzle_loader_version").toString().contains("development")) return;
+
+
+				// Mixins
+				if (puzzleVersionString.compareTo(PUZZLE_VERSION_REFACTOR) > 0 || "2.0.0".equals(project.getProperties().get("puzzle_loader_version").toString()))
+					addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
+				else
+					addImpl(project, "org.spongepowered:mixin:0.8.5");
+			}
 		}
 	}
 
