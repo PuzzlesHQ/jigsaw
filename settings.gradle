@@ -20,3 +20,5 @@ dependencyResolutionManagement {
 }
 
 include "bootstrap"
+include 'test'
+

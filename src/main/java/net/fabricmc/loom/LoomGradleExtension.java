@@ -72,7 +72,7 @@ public interface LoomGradleExtension extends LoomGradleExtensionAPI {
 
 	void setMinecraftProvider(CosmicReachProvider minecraftProvider);
 
-	default List<Path> getMinecraftJars() {
+	default List<Path> getCosmicReachJars() {
 		return getFinalizedCosmicReachProvider().getCosmicReachJarPaths();
 	}
 
@@ -95,7 +95,7 @@ public interface LoomGradleExtension extends LoomGradleExtensionAPI {
 
 	boolean isConfigurationCacheActive();
 
-	FileCollection  getMinecraftJarsCollection();
+	FileCollection getCosmicReachJarsCollection();
 
 	void setFinalizedCosmicReachProvider(FinalizedCosmicReachProvider<?> finalizedCosmicReachProvider);
 

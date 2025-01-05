@@ -79,7 +79,7 @@ public abstract class LoomTasks implements Runnable {
 			task.dependsOn(getTasks().named("generateDLIConfig"));
 			task.dependsOn(getTasks().named("generateLog4jConfig"));
 
-			task.setDescription("Setup the required files to launch Minecraft");
+			task.setDescription("Setup the required files to launch CosmicReach");
 			task.setGroup(Constants.TaskGroup.PUZZLE);
 		});
 
@@ -218,7 +218,7 @@ public abstract class LoomTasks implements Runnable {
 //				task.dependsOn(tasks.named("extractNatives"));
 //			}
 
-			task.setDescription("Setup the required files to launch the Minecraft client");
+			task.setDescription("Setup the required files to launch the CosmicReach client");
 			task.setGroup(Constants.TaskGroup.PUZZLE);
 		});
 	}

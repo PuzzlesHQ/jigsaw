@@ -27,8 +27,6 @@ package net.fabricmc.loom.extension;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -117,7 +115,7 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 
 	@Override
 	public CosmicReachMetadataProvider getMetadataProvider() {
-		return Objects.requireNonNull(metadataProvider, "Cannot get MinecraftMetadataProvider before it has been setup");
+		return Objects.requireNonNull(metadataProvider, "Cannot get CosmicMetadataProvider before it has been setup");
 	}
 
 	@Override
@@ -127,7 +125,7 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 
 	@Override
 	public CosmicReachProvider getCosmicReachProvider() {
-		return Objects.requireNonNull(minecraftProvider, "Cannot get MinecraftProvider before it has been setup");
+		return Objects.requireNonNull(minecraftProvider, "Cannot get CosmicProvider before it has been setup");
 	}
 
 	@Override
@@ -215,10 +213,10 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 	}
 
 	@Override
-	public FileCollection getMinecraftJarsCollection() {
+	public FileCollection getCosmicReachJarsCollection() {
 		return getProject().files(
 				getProject().provider(() ->
-						getProject().files(getMinecraftJars().stream().map(Path::toFile).toList())
+						getProject().files(getCosmicReachJars().stream().map(Path::toFile).toList())
 				)
 		);
 	}

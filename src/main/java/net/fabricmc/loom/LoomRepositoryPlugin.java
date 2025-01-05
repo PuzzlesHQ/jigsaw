@@ -254,8 +254,8 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	}
 
 	/**
-	 * Gets the Maven formatted string to Puzzle Paradox with the specified ${version}
-	 * @param ver Version of PuzzleParadox
+	 * Gets the Maven formatted string to Quilt with the specified ${version}
+	 * @param ver Version of Quilt
 	 * @return Gradle dependency ready formatted string
 	 * @since 1.1.0
 	 */

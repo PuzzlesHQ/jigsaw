@@ -94,11 +94,19 @@ public final class PuzzleModJsonV0 extends PuzzleModJson {
 
 	@Override
 	public Map<String, ModEnvironment> getClassTweakers() {
+		Map<String, ModEnvironment> environmentMap = new HashMap<>();
+
+		if (jsonObject.has("accessTransformers")) {
+			JsonArray array = jsonObject.getAsJsonArray("accessTransformers");
+			List<String> ss = StreamSupport.stream(array.spliterator(), false)
+					.map(JsonElement::getAsString)
+					.toList();
+			for (String s : ss) environmentMap.put(s, ModEnvironment.UNIVERSAL);
+		}
 		if (!jsonObject.has("accessWidener") || !jsonObject.has("accessTransformer") || !jsonObject.has("accessManipulator")) {
 			return Collections.emptyMap();
 		}
 
-		Map<String, ModEnvironment> environmentMap = new HashMap<>();
 
 		if (jsonObject.has("accessWidener")) environmentMap.put(readString(jsonObject, "accessWidener"), ModEnvironment.UNIVERSAL);
 		if (jsonObject.has("accessTransformer")) environmentMap.put(readString(jsonObject, "accessTransformer"), ModEnvironment.UNIVERSAL);

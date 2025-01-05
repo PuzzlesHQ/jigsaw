@@ -51,25 +51,25 @@ public class Constants {
 		public static final String INCLUDE_INTERNAL = "includeInternal";
 		public static final String COSMICREACH = "cosmicReach";
 
-		public static final String COSMICREACH_COMPILE_LIBRARIES = "minecraftLibraries";
-		public static final String COSMICREACH_RUNTIME_LIBRARIES = "minecraftRuntimeLibraries";
+		public static final String COSMICREACH_COMPILE_LIBRARIES = "cosmicLibraries";
+		public static final String COSMICREACH_RUNTIME_LIBRARIES = "cosmicRuntimeLibraries";
 
 		/**
 		 * These configurations contain the minecraft client libraries.
 		 */
-		public static final String COSMICREACH_CLIENT_COMPILE_LIBRARIES = "minecraftClientLibraries";
-		public static final String COSMICREACH_CLIENT_RUNTIME_LIBRARIES = "minecraftClientRuntimeLibraries";
+		public static final String COSMICREACH_CLIENT_COMPILE_LIBRARIES = "cosmicClientLibraries";
+		public static final String COSMICREACH_CLIENT_RUNTIME_LIBRARIES = "cosmicClientRuntimeLibraries";
 
 		/**
 		 * The server specific configurations will be empty when using a legacy (pre 21w38a server jar)
 		 * find the client only dependencies on the "minecraftLibraries" config.
 		 */
-		public static final String COSMICREACH_SERVER_COMPILE_LIBRARIES = "minecraftServerLibraries";
-		public static final String COSMICREACH_SERVER_RUNTIME_LIBRARIES = "minecraftServerRuntimeLibraries";
+		public static final String COSMICREACH_SERVER_COMPILE_LIBRARIES = "cosmicServerLibraries";
+		public static final String COSMICREACH_SERVER_RUNTIME_LIBRARIES = "cosmicServerRuntimeLibraries";
 		/**
 		 * Before Minecraft 1.19-pre1 this contains libraries that need to be extracted otherwise this goes on the runtime classpath.
 		 */
-		public static final String COSMICREACH_NATIVES = "minecraftNatives";
+		public static final String COSMICREACH_NATIVES = "cosmicNatives";
 		public static final String LOADER_DEPENDENCIES = "loaderLibraries";
 		public static final String LOOM_DEVELOPMENT_DEPENDENCIES = "loomDevelopmentDependencies";
 		public static final String MAPPING_CONSTANTS = "mappingsConstants";
@@ -102,12 +102,15 @@ public class Constants {
 		public static final String KNOT_CLIENT = "com.github.puzzle.core.loader.launch.pieces.ClientPiece";
 		public static final String KNOT_SERVER = "com.github.puzzle.core.loader.launch.pieces.ServerPiece";
 
+		public static final String QKNOT_CLIENT = "dev.crmodders.cosmicquilt.loader.knot.KnotClient";
+		public static final String QKNOT_SERVER = "dev.crmodders.cosmicquilt.loader.knot.KnotServer";
+
 		private Knot() {
 		}
 	}
 
 	public static final class TaskGroup {
-		public static final String PUZZLE = "puzzle";
+		public static final String PUZZLE = "jigsaw";
 		public static final String IDE = "ide";
 
 		private TaskGroup() {

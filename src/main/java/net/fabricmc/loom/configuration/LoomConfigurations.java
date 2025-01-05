@@ -46,10 +46,8 @@ import org.gradle.api.attributes.Usage;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
 
-import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.util.Constants;
 import net.fabricmc.loom.util.LoomVersions;
-import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public abstract class LoomConfigurations implements Runnable {
 	@Inject
