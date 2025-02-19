@@ -123,7 +123,6 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 
 				if (project.getProperties().get("puzzle_loader_version").toString().contains("development")) return;
 
-
 				// Mixins
 				if (puzzleVersionString.compareTo(PUZZLE_VERSION_REFACTOR) > 0 || "2.0.0".equals(project.getProperties().get("puzzle_loader_version").toString()))
 					addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
@@ -260,7 +259,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * @since 1.1.0
 	 */
 	static String getPuzzleParadox(String ver) {
-		return "com.github.PuzzleLoader:Paradox:" + ver;
+		return "com.github.PuzzlesHQ:Paradox:" + ver;
 	}
 
 	/**
@@ -270,7 +269,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * @since 1.0.0
 	 */
 	static String getPuzzleLoader(String ver) {
-		return "com.github.PuzzleLoader:PuzzleLoader:" + ver;
+		return "com.github.PuzzlesHQ:PuzzleLoader:" + ver;
 	}
 
 	/**
@@ -280,6 +279,6 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * @since 1.0.0
 	 */
 	static String getAccessManipulators(String ver) {
-		return "com.github.PuzzleLoader:access_manipulators:" + ver;
+		return "com.github.PuzzlesHQ:access_manipulators:" + ver;
 	}
 }
