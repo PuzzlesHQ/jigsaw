@@ -145,14 +145,13 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			repo.setUrl("https://repo.spongepowered.org/repository/maven-public/");
 		});
 
-
 		IvyArtifactRepository cosmicArchiveRepo = repositories.ivy(repo -> { // The CR repo
 			repo.setName("CosmicArchive");
-			repo.setUrl("https://github.com/CRModders/CosmicArchive/raw/main/versions/pre-alpha");
+			repo.setUrl("https://github.com/CRModders/CosmicArchive/raw/main/versions");
 
 			repo.patternLayout(pattern -> {
-				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-[revision].jar");
-				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-Server-[revision].jar");
+				pattern.artifact("/[artifact]/[revision]/[classifier]/Cosmic Reach-[revision].jar");
+				pattern.artifact("/[artifact]/[revision]/[classifier]/Cosmic Reach-Server-[revision].jar");
 			});
 
 			repo.metadataSources(sources -> {
