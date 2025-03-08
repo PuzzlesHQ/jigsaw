@@ -145,28 +145,9 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			repo.setUrl("https://repo.spongepowered.org/repository/maven-public/");
 		});
 
-		IvyArtifactRepository cosmicArchiveRepo = repositories.ivy(repo -> { // The CR repo
+		IvyArtifactRepository cosmicArchiveRepoPreAlpha = repositories.ivy(repo -> { // The CR repo
 			repo.setName("CosmicArchive");
-			repo.setUrl("https://github.com/CRModders/CosmicArchive/raw/main/versions");
-
-			repo.patternLayout(pattern -> {
-				pattern.artifact("/[artifact]/[revision]/[classifier]/Cosmic Reach-[revision].jar");
-				pattern.artifact("/[artifact]/[revision]/[classifier]/Cosmic Reach-Server-[revision].jar");
-			});
-
-			repo.metadataSources(sources -> {
-				sources.artifact();
-				sources.ignoreGradleMetadataRedirection();
-			});
-
-			repo.content(content -> {
-				content.includeModule("finalforeach", "cosmicreach");
-			});
-		});
-
-		IvyArtifactRepository puzzleArchiveRepo = repositories.ivy(repo -> { // The CR repo
-			repo.setName("PuzzleArchive");
-			repo.setUrl("https://github.com/PuzzleLoader/CRPuzzleArchive/raw/main/versions/pre-alpha");
+			repo.setUrl("https://github.com/CRModders/CosmicArchive/raw/main/versions/pre-alpha");
 
 			repo.patternLayout(pattern -> {
 				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-[revision].jar");
@@ -178,23 +159,64 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 				sources.ignoreGradleMetadataRedirection();
 			});
 
-
 			repo.content(content -> {
-				content.includeModule("finalforeach", "cosmicreach");
+				content.includeModule("finalforeach", "cosmicreach-prealpha");
 			});
 		});
+
+		IvyArtifactRepository cosmicArchiveRepoAlpha = repositories.ivy(repo -> { // The CR repo
+			repo.setName("CosmicArchive");
+			repo.setUrl("https://github.com/CRModders/CosmicArchive/raw/main/versions/alpha");
+
+			repo.patternLayout(pattern -> {
+				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-[revision].jar");
+				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-Server-[revision].jar");
+			});
+
+			repo.metadataSources(sources -> {
+				sources.artifact();
+				sources.ignoreGradleMetadataRedirection();
+			});
+
+			repo.content(content -> {
+				content.includeModule("finalforeach", "cosmicreach-alpha");
+			});
+		});
+//
+//		IvyArtifactRepository puzzleArchiveRepo = repositories.ivy(repo -> { // The CR repo
+//			repo.setName("PuzzleArchive");
+//			repo.setUrl("https://github.com/PuzzleLoader/CRPuzzleArchive/raw/main/versions/pre-alpha");
+//
+//			repo.patternLayout(pattern -> {
+//				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-[revision].jar");
+//				pattern.artifact("/[revision]/[classifier]/Cosmic Reach-Server-[revision].jar");
+//			});
+//
+//			repo.metadataSources(sources -> {
+//				sources.artifact();
+//				sources.ignoreGradleMetadataRedirection();
+//			});
+//
+//
+//			repo.content(content -> {
+//				content.includeModule("finalforeach", "cosmicreach");
+//			});
+//		});
 
 		// If a mavenCentral repo is already defined, remove the mojang repo and add it back before the mavenCentral repo so that it will be checked first.
 		// See: https://github.com/FabricMC/fabric-loom/issues/621
 		ArtifactRepository mavenCentral = repositories.findByName(ArtifactRepositoryContainer.DEFAULT_MAVEN_CENTRAL_REPO_NAME);
 
-		repositories.add(cosmicArchiveRepo);
-		repositories.add(puzzleArchiveRepo);
+		repositories.add(cosmicArchiveRepoAlpha);
+		repositories.add(cosmicArchiveRepoPreAlpha);
+//		repositories.add(puzzleArchiveRepo);
 		if (mavenCentral != null) {
-			repositories.remove(cosmicArchiveRepo);
-			repositories.remove(puzzleArchiveRepo);
-			repositories.add(repositories.indexOf(mavenCentral), cosmicArchiveRepo);
-			repositories.add(repositories.indexOf(cosmicArchiveRepo), puzzleArchiveRepo);
+			repositories.remove(cosmicArchiveRepoAlpha);
+			repositories.remove(cosmicArchiveRepoPreAlpha);
+//			repositories.remove(puzzleArchiveRepo);
+			repositories.add(repositories.indexOf(mavenCentral), cosmicArchiveRepoAlpha);
+			repositories.add(repositories.indexOf(mavenCentral), cosmicArchiveRepoPreAlpha);
+//			repositories.add(repositories.indexOf(cosmicArchiveRepo), puzzleArchiveRepo);
 		}
 
 		repositories.mavenCentral();
