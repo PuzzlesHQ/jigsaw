@@ -38,6 +38,8 @@ import net.fabricmc.loom.configuration.mods.dependency.LocalMavenHelper;
 import net.fabricmc.loom.configuration.processors.CosmicReachJarProcessorManager;
 import net.fabricmc.loom.configuration.processors.ProcessorContextImpl;
 
+import org.slf4j.LoggerFactory;
+
 public abstract class ProcessedNamedCosmicReachProvider<M extends CosmicReachProvider, P extends FinalizedCosmicReachProvider<M>> extends FinalizedCosmicReachProvider<M> {
 	private final P parentMinecraftProvider;
 	private final CosmicReachJarProcessorManager jarProcessorManager;
@@ -79,6 +81,8 @@ public abstract class ProcessedNamedCosmicReachProvider<M extends CosmicReachPro
 	}
 
 	private void processJars(Map<CosmicReachJar, CosmicReachJar> minecraftJarMap, ConfigContext configContext) throws IOException {
+
+		System.out.println(jarProcessorManager.jarProcessors.size());
 		for (Map.Entry<CosmicReachJar, CosmicReachJar> entry : minecraftJarMap.entrySet()) {
 			final CosmicReachJar minecraftJar = entry.getKey();
 			final CosmicReachJar outputJar = entry.getValue();

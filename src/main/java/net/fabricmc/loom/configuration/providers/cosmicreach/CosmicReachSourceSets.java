@@ -28,6 +28,11 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import com.google.common.base.Preconditions;
+
+import net.fabricmc.loom.configuration.RemapConfigurations;
+
+import net.fabricmc.loom.task.AbstractRemapJarTask;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.JavaPlugin;
@@ -209,6 +214,9 @@ public abstract sealed class CosmicReachSourceSets permits CosmicReachSourceSets
 			extendsFrom(project, testSourceSet.getRuntimeClasspathConfigurationName(), clientOnlySourceSet.getRuntimeClasspathConfigurationName());
 			project.getDependencies().add(testSourceSet.getImplementationConfigurationName(), clientOnlySourceSet.getOutput());
 
+
+			RemapConfigurations.configureClientConfigurations(project, clientOnlySourceSet);
+
 			// Include the client only output in the jars
 			project.getTasks().named(mainSourceSet.getJarTaskName(), Jar.class).configure(jar -> {
 				jar.from(clientOnlySourceSet.getOutput().getClassesDirs());
@@ -217,6 +225,13 @@ public abstract sealed class CosmicReachSourceSets permits CosmicReachSourceSets
 				jar.dependsOn(project.getTasks().named(clientOnlySourceSet.getProcessResourcesTaskName()));
 			});
 
+			project.getTasks().withType(AbstractRemapJarTask.class).configureEach(remapJarTask -> {
+				remapJarTask.getClasspath().from(
+						project.getConfigurations().getByName(clientOnlySourceSet.getCompileClasspathConfigurationName())
+				);
+			});
+
+			// The sources tas
 			// The sources task can be registered at a later time.
 			project.getTasks().configureEach(task -> {
 				if (!mainSourceSet.getSourcesJarTaskName().equals(task.getName()) || !(task instanceof Jar jar)) {
@@ -226,6 +241,10 @@ public abstract sealed class CosmicReachSourceSets permits CosmicReachSourceSets
 
 				// The client only sources to the combined sources jar.
 				jar.from(clientOnlySourceSet.getAllSource());
+			});
+			project.getTasks().withType(AbstractRemapJarTask.class, task -> {
+				// Set the default client only source set name
+				task.getClientOnlySourceSetName().convention(CLIENT_ONLY_SOURCE_SET_NAME);
 			});
 
 		}

@@ -43,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
+import net.fabricmc.loom.api.processor.CosmicReachtJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
 import net.fabricmc.loom.util.Checksum;
@@ -53,7 +53,7 @@ import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.tree.MappingTree;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
-public abstract class ModJavadocProcessor implements MinecraftJarProcessor<ModJavadocProcessor.Spec> {
+public abstract class ModJavadocProcessor implements CosmicReachtJarProcessor<ModJavadocProcessor.Spec> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModJavadocProcessor.class);
 
 	private final String name;
@@ -88,7 +88,7 @@ public abstract class ModJavadocProcessor implements MinecraftJarProcessor<ModJa
 		return new Spec(Collections.unmodifiableList(javadocs));
 	}
 
-	public record Spec(List<ModJavadoc> javadocs) implements MinecraftJarProcessor.Spec {
+	public record Spec(List<ModJavadoc> javadocs) implements CosmicReachtJarProcessor.Spec {
 	}
 
 	@Override

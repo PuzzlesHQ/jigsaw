@@ -32,8 +32,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -48,6 +53,8 @@ import net.fabricmc.loom.util.Constants;
 import net.fabricmc.loom.util.fmj.PuzzleModJson;
 import net.fabricmc.loom.util.fmj.FabricModJsonHelpers;
 import net.fabricmc.loom.util.gradle.GradleUtils;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @param modDependencies External mods that are depended on
@@ -64,6 +71,23 @@ public record SpecContextImpl(List<PuzzleModJson> modDependencies, List<PuzzleMo
 	private static List<PuzzleModJson> getDependentMods(Project project, Map<String, List<PuzzleModJson>> fmjCache) {
 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
 		var mods = new ArrayList<PuzzleModJson>();
+		for (RemapConfigurationSettings entry : extension.getRemapConfigurations()) {
+			final Set<File> artifacts = entry.getSourceConfiguration().get().resolve();
+
+			for (File artifact : artifacts) {
+				final List<PuzzleModJson> fabricModJson = fmjCache.computeIfAbsent(artifact.toPath().toAbsolutePath().toString(), $ -> {
+					return FabricModJsonFactory.createFromZipOptional(artifact.toPath())
+							.map(List::of)
+							.orElseGet(List::of);
+				});
+
+				if (!fabricModJson.isEmpty()) {
+					mods.add(fabricModJson.get(0));
+				}else{
+					System.out.println("nod Mod json ");
+				}
+			}
+		}
 
 		if (!GradleUtils.getBooleanProperty(project, Constants.Properties.DISABLE_PROJECT_DEPENDENT_MODS)) {
 			// Add all the dependent projects
@@ -98,6 +122,39 @@ public record SpecContextImpl(List<PuzzleModJson> modDependencies, List<PuzzleMo
 		return Collections.unmodifiableList(mods);
 	}
 
+	// Returns a list of jar mods that are found on the compile and runtime remapping configurations
+	private static Stream<PuzzleModJson> getCompileRuntimeModsFromRemapConfigs(Project project, Map<String, List<PuzzleModJson>> fmjCache) {
+		final LoomGradleExtension extension = LoomGradleExtension.get(project);
+		final List<Path> runtimeEntries = extension.getRuntimeRemapConfigurations().stream()
+				.filter(settings -> settings.getApplyDependencyTransforms().get())
+				.flatMap(resolveArtifacts(project, true))
+				.toList();
+
+		return extension.getCompileRemapConfigurations().stream()
+				.filter(settings -> settings.getApplyDependencyTransforms().get())
+				.flatMap(resolveArtifacts(project, false))
+				.filter(runtimeEntries::contains) // Use the intersection of the two configurations.
+				.map(zipPath -> {
+					final List<PuzzleModJson> list = fmjCache.computeIfAbsent(zipPath.toAbsolutePath().toString(), $ -> {
+						return FabricModJsonFactory.createFromZipOptional(zipPath)
+								.map(List::of)
+								.orElseGet(List::of);
+					});
+					return list.isEmpty() ? null : list.get(0);
+				})
+				.filter(Objects::nonNull)
+				.sorted(Comparator.comparing(PuzzleModJson::getId));
+	}
+	private static Function<Path, @Nullable PuzzleModJson> modFromZip(Map<String, List<PuzzleModJson>> fmjCache) {
+		return zipPath -> {
+			final List<PuzzleModJson> list = fmjCache.computeIfAbsent(zipPath.toAbsolutePath().toString(), $ -> {
+				return FabricModJsonFactory.createFromZipOptional(zipPath)
+						.map(List::of)
+						.orElseGet(List::of);
+			});
+			return list.isEmpty() ? null : list.get(0);
+		};
+	}
 	private static Function<RemapConfigurationSettings, Stream<Path>> resolveArtifacts(Project project, boolean runtime) {
 		final Usage usage = project.getObjects().named(Usage.class, runtime ? Usage.JAVA_RUNTIME : Usage.JAVA_API);
 

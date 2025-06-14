@@ -46,10 +46,8 @@ public class FabricModJsonHelpers {
 		if (extension.areEnvironmentSourceSetsSplit()) {
 			sourceSets.add(SourceSetHelper.getSourceSetByName("client", project));
 		}
-
 		try {
 			final PuzzleModJson fabricModJson = FabricModJsonFactory.createFromSourceSetsNullable(sourceSets.toArray(SourceSet[]::new));
-
 			if (fabricModJson != null) {
 				return List.of(fabricModJson);
 			}

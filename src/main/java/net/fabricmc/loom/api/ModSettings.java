@@ -27,11 +27,14 @@ package net.fabricmc.loom.api;
 import javax.inject.Inject;
 
 import org.gradle.api.Named;
+import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.ListProperty;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -111,9 +114,7 @@ public abstract class ModSettings implements Named {
 	 */
 	public void configuration(Configuration configuration) {
 		getModFiles().from(configuration);
-	}
-
-	/**
+	}	/**
 	 * List of classpath directories, used to populate the `fabric.classPathGroups` Fabric Loader system property.
 	 * Use the {@link ModSettings#sourceSet} methods to add to this.
 	 */
@@ -122,6 +123,17 @@ public abstract class ModSettings implements Named {
 
 	@Inject
 	public abstract Project getProject();
+
+
+	@ApiStatus.Internal
+	@Internal
+	public final NamedDomainObjectProvider<Configuration> getSourceConfiguration() {
+		return getConfigurationByName(getName());
+	}
+	@Internal
+	private NamedDomainObjectProvider<Configuration> getConfigurationByName(String name) {
+		return getProject().getConfigurations().named(name);
+	}
 
 	@Override
 	public String toString() {

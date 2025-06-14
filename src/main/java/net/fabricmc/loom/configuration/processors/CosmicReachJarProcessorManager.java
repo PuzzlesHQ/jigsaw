@@ -42,16 +42,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.loom.LoomGradleExtension;
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
+import net.fabricmc.loom.api.processor.CosmicReachtJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
 import net.fabricmc.loom.util.Checksum;
-import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public final class CosmicReachJarProcessorManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CosmicReachJarProcessorManager.class);
 
-	private final List<ProcessorEntry<?>> jarProcessors;
+	public final List<ProcessorEntry<?>> jarProcessors;
 
 	private CosmicReachJarProcessorManager(List<ProcessorEntry<?>> jarProcessors) {
 		this.jarProcessors = Collections.unmodifiableList(jarProcessors);
@@ -60,22 +59,17 @@ public final class CosmicReachJarProcessorManager {
 	@Nullable
 	public static CosmicReachJarProcessorManager create(Project project) {
 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
-		List<MinecraftJarProcessor<?>> processors = new ArrayList<>(extension.getMinecraftJarProcessors().get());
-
-		for (JarProcessor legacyProcessor : extension.getGameJarProcessors().get()) {
-			processors.add(project.getObjects().newInstance(LegacyJarProcessorWrapper.class, legacyProcessor));
-		}
+		List<CosmicReachtJarProcessor<?>> processors = new ArrayList<>(extension.getMinecraftJarProcessors().get());
 
 		return CosmicReachJarProcessorManager.create(processors, SpecContextImpl.create(project));
 	}
 
 	@Nullable
-	public static CosmicReachJarProcessorManager create(List<MinecraftJarProcessor<?>> processors, SpecContext context) {
+	public static CosmicReachJarProcessorManager create(List<CosmicReachtJarProcessor<?>> processors, SpecContext context) {
 		List<ProcessorEntry<?>> entries = new ArrayList<>();
-
-		for (MinecraftJarProcessor<?> processor : processors) {
+		for (CosmicReachtJarProcessor<?> processor : processors) {
 			LOGGER.debug("Building processor spec for {}", processor.getName());
-			MinecraftJarProcessor.Spec spec = processor.buildSpec(context);
+			CosmicReachtJarProcessor.Spec spec = processor.buildSpec(context);
 
 			if (spec != null) {
 				LOGGER.debug("Adding processor entry for {}", processor.getName());
@@ -136,10 +130,10 @@ public final class CosmicReachJarProcessorManager {
 		}
 	}
 
-	record ProcessorEntry<S extends MinecraftJarProcessor.Spec>(S spec, MinecraftJarProcessor<S> processor) {
+	record ProcessorEntry<S extends CosmicReachtJarProcessor.Spec>(S spec, CosmicReachtJarProcessor<S> processor) {
 		@SuppressWarnings("unchecked")
-		ProcessorEntry(MinecraftJarProcessor<?> processor, MinecraftJarProcessor.Spec spec) {
-			this((S) Objects.requireNonNull(spec), (MinecraftJarProcessor<S>) processor);
+		ProcessorEntry(CosmicReachtJarProcessor<?> processor, CosmicReachtJarProcessor.Spec spec) {
+			this((S) Objects.requireNonNull(spec), (CosmicReachtJarProcessor<S>) processor);
 		}
 
 		private void processJar(Path jar, ProcessorContext context) throws IOException {

@@ -52,10 +52,6 @@ public final class PuzzleModJsonV0 extends PuzzleModJson {
 	@Override
 	@Nullable
 	public JsonElement getCustom(String key) {
-		return getCustom(jsonObject, key);
-	}
-
-	static JsonElement getCustom(JsonObject jsonObject, String key) {
 		if (!jsonObject.has("custom")) {
 			return null;
 		}

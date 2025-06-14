@@ -24,15 +24,16 @@
 
 package net.fabricmc.loom.api;
 
-import java.io.File;
-import java.util.List;
+import net.fabricmc.loom.api.remapping.RemapperExtension;
+
+import net.fabricmc.loom.api.remapping.RemapperParameters;
+
+import net.fabricmc.loom.extension.RemapperExtensionHolder;
 
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectList;
-import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
@@ -44,7 +45,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import net.fabricmc.loom.api.decompilers.DecompilerOptions;
 import net.fabricmc.loom.api.manifest.VersionsManifestsAPI;
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
+import net.fabricmc.loom.api.processor.CosmicReachtJarProcessor;
 import net.fabricmc.loom.configuration.ide.RunConfigSettings;
 import net.fabricmc.loom.configuration.processors.JarProcessor;
 import net.fabricmc.loom.configuration.providers.cosmicreach.ManifestLocations;
@@ -63,6 +64,7 @@ public interface LoomGradleExtensionAPI {
 	NamedDomainObjectContainer<DecompilerOptions> getDecompilerOptions();
 
 	void decompilers(Action<NamedDomainObjectContainer<DecompilerOptions>> action);
+	ListProperty<RemapperExtensionHolder> getRemapperExtensions();
 
 	@Deprecated()
 	ListProperty<JarProcessor> getGameJarProcessors();
@@ -71,10 +73,13 @@ public interface LoomGradleExtensionAPI {
 	default void addJarProcessor(JarProcessor processor) {
 		getGameJarProcessors().add(processor);
 	}
+	NamedDomainObjectList<RemapConfigurationSettings> getRemapConfigurations();
+	void createRemapConfigurations(SourceSet sourceSet);
+	RemapConfigurationSettings addRemapConfiguration(String name, Action<RemapConfigurationSettings> action);
 
-	ListProperty<MinecraftJarProcessor<?>> getMinecraftJarProcessors();
+	ListProperty<CosmicReachtJarProcessor<?>> getMinecraftJarProcessors();
 
-	void addMinecraftJarProcessor(Class<? extends MinecraftJarProcessor<?>> clazz, Object... parameters);
+	void addCosmicReachJarProcessor(Class<? extends CosmicReachtJarProcessor<?>> clazz, Object... parameters);
 
 	ConfigurableFileCollection getLog4jConfigs();
 
@@ -91,6 +96,7 @@ public interface LoomGradleExtensionAPI {
 	}
 
 	void mixin(Action<MixinExtensionAPI> action);
+	<T extends RemapperParameters> void addRemapperExtension(Class<? extends RemapperExtension<T>> remapperExtensionClass, Class<T> parametersClass, Action<T> parameterAction);
 
 	/**
 	 * Optionally register and configure a {@link ModSettings} object. The name should match the modid.

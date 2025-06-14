@@ -30,9 +30,7 @@ import java.nio.file.Path;
 import org.gradle.api.Named;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.mappingio.tree.MemoryMappingTree;
-
-public interface MinecraftJarProcessor<S extends MinecraftJarProcessor.Spec> extends Named {
+public interface CosmicReachtJarProcessor<S extends CosmicReachtJarProcessor.Spec> extends Named {
 	@Nullable
 	S buildSpec(SpecContext context);
 

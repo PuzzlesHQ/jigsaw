@@ -49,7 +49,8 @@ import net.fabricmc.loom.util.ZipUtils;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 public final class FabricModJsonFactory {
-	public static final String FABRIC_MOD_JSON = "fabric.mod.json";
+//	public static final String FABRIC_MOD_JSON = "fabric.mod.json";
+	public static final String PUZZLE_MOD_JSON = "puzzle.mod.json";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FabricModJsonFactory.class);
 
@@ -73,7 +74,7 @@ public final class FabricModJsonFactory {
 
 	public static PuzzleModJson createFromZip(Path zipPath) {
 		try {
-			return create(ZipUtils.unpackGson(zipPath, FABRIC_MOD_JSON, JsonObject.class), new FabricModJsonSource.ZipSource(zipPath));
+			return create(ZipUtils.unpackGson(zipPath, PUZZLE_MOD_JSON, JsonObject.class), new FabricModJsonSource.ZipSource(zipPath));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to read fabric.mod.json file in zip: " + zipPath, e);
 		} catch (JsonSyntaxException e) {
@@ -86,7 +87,7 @@ public final class FabricModJsonFactory {
 		JsonObject jsonObject;
 
 		try {
-			jsonObject = ZipUtils.unpackGsonNullable(zipPath, FABRIC_MOD_JSON, JsonObject.class);
+			jsonObject = ZipUtils.unpackGsonNullable(zipPath, PUZZLE_MOD_JSON, JsonObject.class);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to read zip: " + zipPath, e);
 		} catch (JsonSyntaxException e) {
@@ -106,7 +107,7 @@ public final class FabricModJsonFactory {
 
 	@Nullable
 	public static PuzzleModJson createFromSourceSetsNullable(SourceSet... sourceSets) throws IOException {
-		final File file = SourceSetHelper.findFirstFileInResource(FABRIC_MOD_JSON, sourceSets);
+		final File file = SourceSetHelper.findFirstFileInResource(PUZZLE_MOD_JSON, sourceSets);
 
 		if (file == null) {
 			return null;
@@ -127,10 +128,10 @@ public final class FabricModJsonFactory {
 	}
 
 	public static boolean isModJar(Path input) {
-		return ZipUtils.contains(input, FABRIC_MOD_JSON);
+		return ZipUtils.contains(input, PUZZLE_MOD_JSON);
 	}
 
 	public static boolean containsMod(FileSystemUtil.Delegate fs) {
-		return Files.exists(fs.getPath(FABRIC_MOD_JSON));
+		return Files.exists(fs.getPath(PUZZLE_MOD_JSON));
 	}
 }

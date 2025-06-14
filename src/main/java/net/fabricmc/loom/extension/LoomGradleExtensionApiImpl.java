@@ -27,6 +27,10 @@ package net.fabricmc.loom.extension;
 import java.io.IOException;
 import java.util.Set;
 
+import net.fabricmc.loom.api.remapping.RemapperExtension;
+import net.fabricmc.loom.api.remapping.RemapperParameters;
+import net.fabricmc.loom.configuration.RemapConfigurations;
+
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectList;
@@ -34,6 +38,7 @@ import org.gradle.api.Project;
 import org.gradle.api.UncheckedIOException;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -47,7 +52,7 @@ import net.fabricmc.loom.api.MixinExtensionAPI;
 import net.fabricmc.loom.api.ModSettings;
 import net.fabricmc.loom.api.RemapConfigurationSettings;
 import net.fabricmc.loom.api.decompilers.DecompilerOptions;
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
+import net.fabricmc.loom.api.processor.CosmicReachtJarProcessor;
 import net.fabricmc.loom.configuration.ide.RunConfigSettings;
 import net.fabricmc.loom.configuration.processors.JarProcessor;
 import net.fabricmc.loom.configuration.providers.cosmicreach.ManifestLocations;
@@ -59,6 +64,9 @@ import net.fabricmc.loom.util.MirrorUtil;
 import net.fabricmc.loom.util.fmj.PuzzleModJson;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
+
+import org.gradle.api.tasks.SourceSet;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the public extension api.
@@ -85,7 +93,8 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 	private final NamedDomainObjectContainer<DecompilerOptions> decompilers;
 	private final NamedDomainObjectContainer<ModSettings> mods;
 	private final NamedDomainObjectList<RemapConfigurationSettings> remapConfigurations;
-	private final ListProperty<MinecraftJarProcessor<?>> minecraftJarProcessors;
+	private final ListProperty<CosmicReachtJarProcessor<?>> minecraftJarProcessors;
+	protected final ListProperty<RemapperExtensionHolder> remapperExtensions;
 
 	// A common mistake with layered mappings is to call the wrong `officialMojangMappings` method, use this to keep track of when we are building a layered mapping spec.
 	protected final ThreadLocal<Boolean> layeredSpecBuilderScope = ThreadLocal.withInitial(() -> false);
@@ -126,7 +135,7 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 		this.mods = project.getObjects().domainObjectContainer(ModSettings.class);
 		this.remapConfigurations = project.getObjects().namedDomainObjectList(RemapConfigurationSettings.class);
 		//noinspection unchecked
-		this.minecraftJarProcessors = (ListProperty<MinecraftJarProcessor<?>>) (Object) project.getObjects().listProperty(MinecraftJarProcessor.class);
+		this.minecraftJarProcessors = (ListProperty<CosmicReachtJarProcessor<?>>) (Object) project.getObjects().listProperty(CosmicReachtJarProcessor.class);
 		this.minecraftJarProcessors.finalizeValueOnRead();
 
 		//noinspection unchecked
@@ -169,6 +178,9 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 		interfaceInjection(interfaceInjection -> {
 			interfaceInjection.getEnableDependencyInterfaceInjection().convention(true).finalizeValueOnRead();
 		});
+		remapperExtensions = project.getObjects().listProperty(RemapperExtensionHolder.class);
+		remapperExtensions.finalizeValueOnRead();
+
 	}
 
 	@Override
@@ -179,6 +191,11 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 	@Override
 	public RegularFileProperty getAccessWidenerPath() {
 		return accessWidener;
+	}
+
+	@Override
+	public ListProperty<RemapperExtensionHolder> getRemapperExtensions() {
+		return remapperExtensions;
 	}
 
 	@Override
@@ -197,13 +214,35 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 	}
 
 	@Override
-	public ListProperty<MinecraftJarProcessor<?>> getMinecraftJarProcessors() {
+	public NamedDomainObjectList<RemapConfigurationSettings> getRemapConfigurations() {
+		return remapConfigurations;
+	}
+	@Override
+	public RemapConfigurationSettings addRemapConfiguration(String name, Action<RemapConfigurationSettings> action) {
+		final RemapConfigurationSettings configurationSettings = getProject().getObjects().newInstance(RemapConfigurationSettings.class, name);
+
+		// TODO remove in 2.0, this is a fallback to mimic the previous (Broken) behaviour
+		configurationSettings.getSourceSet().convention(SourceSetHelper.getMainSourceSet(getProject()));
+
+		action.execute(configurationSettings);
+		RemapConfigurations.applyToProject(getProject(), configurationSettings);
+		remapConfigurations.add(configurationSettings);
+
+		return configurationSettings;
+	}
+
+	public void createRemapConfigurations(SourceSet sourceSet) {
+		RemapConfigurations.setupForSourceSet(getProject(), sourceSet);
+	}
+	@Override
+	public ListProperty<CosmicReachtJarProcessor<?>> getMinecraftJarProcessors() {
 		return minecraftJarProcessors;
 	}
 
 	@Override
-	public void addMinecraftJarProcessor(Class<? extends MinecraftJarProcessor<?>> clazz, Object... parameters) {
+	public void addCosmicReachJarProcessor(Class<? extends CosmicReachtJarProcessor<?>> clazz, Object... parameters) {
 		getMinecraftJarProcessors().add(getProject().getObjects().newInstance(clazz, parameters));
+
 	}
 
 	@Override
@@ -225,7 +264,22 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
 	public void mixin(Action<MixinExtensionAPI> action) {
 		action.execute(getMixin());
 	}
+	@Override
+	public <T extends RemapperParameters> void addRemapperExtension(Class<? extends RemapperExtension<T>> remapperExtensionClass, Class<T> parametersClass, Action<T> parameterAction) {
+		final ObjectFactory objectFactory = getProject().getObjects();
+		final RemapperExtensionHolder holder;
 
+		if (parametersClass != RemapperParameters.None.class) {
+			T parameters = objectFactory.newInstance(parametersClass);
+			parameterAction.execute(parameters);
+			holder = objectFactory.newInstance(RemapperExtensionHolder.class, parameters);
+		} else {
+			holder = objectFactory.newInstance(RemapperExtensionHolder.class, RemapperParameters.None.INSTANCE);
+		}
+
+		holder.getRemapperExtensionClass().set(remapperExtensionClass.getName());
+		remapperExtensions.add(holder);
+	}
 	@Override
 	public ManifestLocations getVersionsManifests() {
 		return versionsManifests;

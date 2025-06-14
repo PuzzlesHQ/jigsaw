@@ -32,8 +32,11 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import net.fabricmc.loom.api.RemapConfigurationSettings;
 import net.fabricmc.loom.configuration.providers.cosmicreach.FinalizedCosmicReachProvider;
 
+import org.gradle.api.Action;
+import org.gradle.api.NamedDomainObjectList;
 import org.gradle.api.Project;
 import org.gradle.api.configuration.BuildFeatures;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -49,6 +52,8 @@ import net.fabricmc.loom.configuration.providers.cosmicreach.CosmicReachProvider
 import net.fabricmc.loom.configuration.providers.cosmicreach.library.LibraryProcessorManager;
 import net.fabricmc.loom.util.download.Download;
 import net.fabricmc.loom.util.download.DownloadBuilder;
+
+import org.gradle.api.tasks.SourceSet;
 
 public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl implements LoomGradleExtension {
 	private final Project project;
@@ -138,6 +143,7 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 		return unmappedMods;
 	}
 
+
 	public void setInstallerData(InstallerData object) {
 		this.installerData = object;
 	}
@@ -206,7 +212,10 @@ public abstract class LoomGradleExtensionImpl extends LoomGradleExtensionApiImpl
 	public ListProperty<LibraryProcessorManager.LibraryProcessorFactory> getLibraryProcessors() {
 		return libraryProcessorFactories;
 	}
-
+	@Override
+	public boolean isProjectIsolationActive() {
+		return isolatedProjectsActive;
+	}
 	@Override
 	public boolean isConfigurationCacheActive() {
 		return configurationCacheActive;

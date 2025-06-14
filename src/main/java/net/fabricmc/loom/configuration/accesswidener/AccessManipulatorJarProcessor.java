@@ -24,9 +24,7 @@
 
 package net.fabricmc.loom.configuration.accesswidener;
 
-import com.github.puzzle.access_manipulators.AccessManipulators;
-
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
+import net.fabricmc.loom.api.processor.CosmicReachtJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
 import net.fabricmc.loom.util.fmj.PuzzleModJson;
@@ -46,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class AccessManipulatorJarProcessor implements MinecraftJarProcessor<AccessManipulatorJarProcessor.Spec> {
+public class AccessManipulatorJarProcessor implements CosmicReachtJarProcessor<AccessManipulatorJarProcessor.Spec> {
 	private final RegularFileProperty localAccessManipulatorProperty;
 
 	@Inject
@@ -77,7 +75,6 @@ public class AccessManipulatorJarProcessor implements MinecraftJarProcessor<Acce
 		}
 
 		 */
-
 		for (PuzzleModJson fabricModJson : context.modDependencies()) {
 			accessWideners.addAll(ModAccessWidenerEntry.readAll(fabricModJson, true));
 		}
@@ -94,7 +91,7 @@ public class AccessManipulatorJarProcessor implements MinecraftJarProcessor<Acce
 		return "Manipulator";
 	}
 
-	public record Spec(List<AccessWidenerEntry> accessWideners) implements MinecraftJarProcessor.Spec {
+	public record Spec(List<AccessWidenerEntry> accessWideners) implements CosmicReachtJarProcessor.Spec {
 		List<AccessWidenerEntry> accessWidenersForContext(ProcessorContext context) {
 			return accessWideners.stream()
 					.filter(entry -> isSupported(entry.environment(), context))

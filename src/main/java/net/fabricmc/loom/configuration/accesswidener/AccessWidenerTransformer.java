@@ -53,7 +53,7 @@ final class AccessWidenerTransformer {
 	 */
 	void apply(Path jarFile) {
 		try {
-			ZipUtils.transform(jarFile, getTransformers(AccessManipulators.affectedClasses));
+			ZipUtils.transform(jarFile, 	getTransformers(AccessManipulators.affectedClasses));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Failed to apply access wideners to %s".formatted(jarFile), e);
 		}

@@ -30,6 +30,9 @@ import java.util.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import net.fabricmc.loom.task.RemapTaskConfiguration;
+
 import org.gradle.api.Project;
 import org.gradle.api.plugins.PluginAware;
 
@@ -57,6 +60,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
 			LoomConfigurations.class,
 			CompileConfiguration.class,
 			MavenPublication.class,
+			RemapTaskConfiguration.class,
 			LoomTasks.class,
 			IdeaConfiguration.class,
 			SandboxConfiguration.class

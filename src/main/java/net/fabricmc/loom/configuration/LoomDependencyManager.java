@@ -24,6 +24,8 @@
 
 package net.fabricmc.loom.configuration;
 
+import net.fabricmc.loom.configuration.mods.ModConfiguration;
+
 import org.gradle.api.Project;
 
 import net.fabricmc.loom.LoomGradleExtension;
@@ -33,7 +35,7 @@ public class LoomDependencyManager {
 	public void handleDependencies(Project project, ServiceFactory serviceFactory) {
 		project.getLogger().info(":setting up loom dependencies");
 		LoomGradleExtension extension = LoomGradleExtension.get(project);
-
+		ModConfiguration.supplyModConfigurations(project, serviceFactory, "notremapped", extension);
 		if (extension.getInstallerData() == null) {
 			project.getLogger().info("fabric-installer.json not found in dependencies");
 		}

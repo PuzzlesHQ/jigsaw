@@ -29,7 +29,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.configuration.providers.cosmicreach.CosmicReachSourceSets;
+
+import net.fabricmc.loom.util.gradle.SourceSetHelper;
 
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
@@ -76,6 +79,7 @@ public abstract class LoomConfigurations implements Runnable {
 
 	@Override
 	public void run() {
+		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
 
 		registerConfigs(false, "bundle", "mod", "internal");
 		try {
@@ -157,6 +161,8 @@ public abstract class LoomConfigurations implements Runnable {
 		register(Constants.Configurations.UNPICK_CLASSPATH, Role.RESOLVABLE);
 		register(Constants.Configurations.LOCAL_RUNTIME, Role.RESOLVABLE);
 		extendsFrom(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME, Constants.Configurations.LOCAL_RUNTIME);
+
+		extension.createRemapConfigurations(SourceSetHelper.getMainSourceSet(getProject()));
 
 		extendsFrom(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME, Constants.Configurations.COSMICREACH_RUNTIME_LIBRARIES);
 

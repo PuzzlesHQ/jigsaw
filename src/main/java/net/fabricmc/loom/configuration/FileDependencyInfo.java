@@ -47,6 +47,7 @@ import org.gradle.api.artifacts.FileCollectionDependency;
 
 import net.fabricmc.loom.util.ZipUtils;
 
+//TODO: change to puzzle.mod.json
 public class FileDependencyInfo extends DependencyInfo {
 	protected final Map<String, File> classifierToFile = new HashMap<>();
 	protected final Set<File> resolvedFiles;

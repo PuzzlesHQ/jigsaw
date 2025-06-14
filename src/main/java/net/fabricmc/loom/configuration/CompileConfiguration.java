@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import net.fabricmc.loom.configuration.accesswidener.AccessManipulatorJarProcessor;
+import net.fabricmc.loom.configuration.ifaceinject.InterfaceInjectionProcessor;
 import net.fabricmc.loom.configuration.providers.cosmicreach.FinalizedCosmicReachProvider;
 
 import org.gradle.api.GradleException;
@@ -70,6 +71,8 @@ import net.fabricmc.loom.util.gradle.GradleUtils;
 import net.fabricmc.loom.util.gradle.SourceSetHelper;
 import net.fabricmc.loom.util.service.ScopedServiceFactory;
 import net.fabricmc.loom.util.service.ServiceFactory;
+
+import org.slf4j.LoggerFactory;
 
 public abstract class CompileConfiguration implements Runnable {
 	@Inject
@@ -150,10 +153,13 @@ public abstract class CompileConfiguration implements Runnable {
 
 		var jarConfiguration = extension.getMinecraftJarConfiguration().get();
 
+
+
 		// Provide the vanilla mc jars
 		final CosmicReachProvider minecraftProvider = jarConfiguration.createMinecraftProvider(metadataProvider, configContext);
 		extension.setMinecraftProvider(minecraftProvider);
 		minecraftProvider.provide();
+
 
 		FinalizedCosmicReachProvider<?> finalizedCosmicReachProvider = jarConfiguration.createFinalizedCosmicReachProvider(project);
 
@@ -183,18 +189,19 @@ public abstract class CompileConfiguration implements Runnable {
 
 	private void registerGameProcessors(ConfigContext configContext) {
 		final LoomGradleExtension extension = configContext.extension();
+		final InterfaceInjectionExtensionAPI interfaceInjection = extension.getInterfaceInjection();
 
-		extension.addMinecraftJarProcessor(AccessManipulatorJarProcessor.class, extension.getAccessWidenerPath());
-
+		if (interfaceInjection.isEnabled()) {
+			extension.addCosmicReachJarProcessor(InterfaceInjectionProcessor.class, "fabric-loom:interface-inject", interfaceInjection.getEnableDependencyInterfaceInjection().get());
+		}
 		if (true) {
-			extension.addMinecraftJarProcessor(ModJavadocProcessor.class, "fabric-loom:mod-javadoc");
+			extension.addCosmicReachJarProcessor(ModJavadocProcessor.class, "fabric-loom:mod-javadoc");
 		}
 
-//		final InterfaceInjectionExtensionAPI interfaceInjection = extension.getInterfaceInjection();
+		extension.addCosmicReachJarProcessor(AccessManipulatorJarProcessor.class, extension.getAccessWidenerPath());
 
-//		if (interfaceInjection.isEnabled()) {
-//			extension.addMinecraftJarProcessor(InterfaceInjectionProcessor.class, "fabric-loom:interface-inject", interfaceInjection.getEnableDependencyInterfaceInjection().get());
-//		}
+
+
 	}
 
 	private void setupMixinAp(MixinExtension mixin) {

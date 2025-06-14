@@ -47,7 +47,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 	}
 }
 
-group = 'net.fabricmc'
+group = 'com.github.PuzzlesHQ'
 def baseVersion = '1.8'
 
 def ENV = System.getenv()
@@ -252,8 +252,8 @@ publishing {
 
 			// Manually crate the plugin marker for snapshot versions
 			snapshotPlugin(MavenPublication) { publication ->
-				groupId 'jigsaw'
-				artifactId 'jigsaw.gradle.plugin'
+				groupId 'com.github.PuzzlesHQ'
+				artifactId 'jigsaw'
 				version baseVersion + '-SNAPSHOT'
 
 				pom.withXml({
@@ -263,7 +263,7 @@ publishing {
 					Node dependencies = root.appendChild(document.createElement('dependencies'))
 					Node dependency = dependencies.appendChild(document.createElement('dependency'))
 					Node groupId = dependency.appendChild(document.createElement('groupId'))
-					groupId.setTextContent('net.fabricmc')
+					groupId.setTextContent('com.github.PuzzlesHQ')
 					Node artifactId = dependency.appendChild(document.createElement('artifactId'))
 					artifactId.setTextContent('jigsaw-gradle')
 					Node version = dependency.appendChild(document.createElement('version'))

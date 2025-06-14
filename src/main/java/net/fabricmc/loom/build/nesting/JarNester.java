@@ -42,6 +42,8 @@ import net.fabricmc.loom.util.Pair;
 import net.fabricmc.loom.util.ZipUtils;
 import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
 
+import static net.fabricmc.loom.util.fmj.FabricModJsonFactory.PUZZLE_MOD_JSON;
+
 public class JarNester {
 	public static void nestJars(Collection<File> jars, File modJar, Logger logger) {
 		if (jars.isEmpty()) {
@@ -60,7 +62,7 @@ public class JarNester {
 				}
 			}).collect(Collectors.toList()));
 
-			int count = ZipUtils.transformJson(JsonObject.class, modJar.toPath(), Stream.of(new Pair<>("fabric.mod.json", json -> {
+			int count = ZipUtils.transformJson(JsonObject.class, modJar.toPath(), Stream.of(new Pair<>(PUZZLE_MOD_JSON, json -> {
 				JsonArray nestedJars = json.getAsJsonArray("jars");
 
 				if (nestedJars == null || !json.has("jars")) {

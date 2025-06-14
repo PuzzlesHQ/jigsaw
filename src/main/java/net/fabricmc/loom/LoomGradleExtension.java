@@ -27,12 +27,16 @@ package net.fabricmc.loom;
 import java.nio.file.Path;
 import java.util.List;
 
+import net.fabricmc.loom.api.RemapConfigurationSettings;
 import net.fabricmc.loom.configuration.providers.cosmicreach.FinalizedCosmicReachProvider;
 
+import org.gradle.api.Action;
+import org.gradle.api.NamedDomainObjectList;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.provider.ListProperty;
+import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.fabricmc.loom.api.LoomGradleExtensionAPI;
@@ -75,7 +79,19 @@ public interface LoomGradleExtension extends LoomGradleExtensionAPI {
 	default List<Path> getCosmicReachJars() {
 		return getFinalizedCosmicReachProvider().getCosmicReachJarPaths();
 	}
+	NamedDomainObjectList<RemapConfigurationSettings> getRemapConfigurations();
 
+	RemapConfigurationSettings addRemapConfiguration(String name, Action<RemapConfigurationSettings> action);
+
+	void createRemapConfigurations(SourceSet sourceSet);
+
+	default List<RemapConfigurationSettings> getCompileRemapConfigurations() {
+		return getRemapConfigurations().stream().filter(element -> element.getOnCompileClasspath().get()).toList();
+	}
+
+	default List<RemapConfigurationSettings> getRuntimeRemapConfigurations() {
+		return getRemapConfigurations().stream().filter(element -> element.getOnRuntimeClasspath().get()).toList();
+	}
 	boolean isRootProject();
 
 	@Override
@@ -100,4 +116,6 @@ public interface LoomGradleExtension extends LoomGradleExtensionAPI {
 	void setFinalizedCosmicReachProvider(FinalizedCosmicReachProvider<?> finalizedCosmicReachProvider);
 
 	FinalizedCosmicReachProvider<?> getFinalizedCosmicReachProvider();
+	boolean isProjectIsolationActive();
+
 }
