@@ -2,7 +2,7 @@
 # Decompilers
 fernflower = "2.0.0"
 cfr = "0.2.2"
-vineflower = "1.10.1"
+vineflower = "1.11.1"
 
 # Runtime depedencies
 mixin-compile-extensions = "0.6.0"
@@ -18,6 +18,7 @@ cfr = { module = "net.fabricmc:cfr", version.ref = "cfr" }
 vineflower = { module = "org.vineflower:vineflower", version.ref = "vineflower" }
 
 # Runtime depedencies
+mixin-compile-extensions = { module = "net.fabricmc:fabric-mixin-compile-extensions", version.ref = "mixin-compile-extensions" }
 dev-launch-injector = { module = "net.fabricmc:dev-launch-injector", version.ref = "dev-launch-injector" }
 terminal-console-appender = { module = "net.minecrell:terminalconsoleappender", version.ref = "terminal-console-appender" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
