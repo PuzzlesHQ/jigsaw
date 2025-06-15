@@ -31,8 +31,8 @@ public class Constants {
 	public static final String LIBRARIES_BASE = "https://libraries.minecraft.net/";
 	public static final String RESOURCES_BASE = "https://resources.download.minecraft.net/";
 //	public static final String VERSION_MANIFESTS = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
-	public static final String VERSION_MANIFESTS = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions.json";
-	public static final String VERSION_MANIFESTS2 = "https://raw.githubusercontent.com/PuzzleLoader/CRPuzzleArchive/refs/heads/main/versions.json";
+	public static final String VERSION_MANIFESTS = "https://raw.githubusercontent.com/CRModders/CosmicArchive/refs/heads/main/versions_v2.json";
+	public static final String VERSION_MANIFESTS2 = "https://raw.githubusercontent.com/PuzzleshQ/CRArchive/refs/heads/main/versions.json";
 	public static final String FABRIC_REPOSITORY = "https://maven.fabricmc.net/";
 
 	public static final int ASM_VERSION = Opcodes.ASM9;
