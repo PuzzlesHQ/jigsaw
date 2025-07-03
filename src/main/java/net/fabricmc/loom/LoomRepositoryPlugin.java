@@ -95,8 +95,8 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			}
 		}
 		if (project.getProperties().get("puzzle_core_version") != null) {
-			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
-			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")));
+//			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 		}
 		// Puzzle Paradox
 		if (project.getProperties().get("puzzle_paradox_version") != null) {
@@ -139,6 +139,10 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		repositories.maven(repo -> {
 			repo.setName("Sponge");
 			repo.setUrl("https://repo.spongepowered.org/repository/maven-public/");
+		});
+		repositories.maven(repo -> {
+			repo.setName("Jitpack");
+			repo.setUrl("https://jitpack.io");
 		});
 
 		IvyArtifactRepository puzzleArchiveRepo = repositories.ivy(repo -> { // The CR repo
