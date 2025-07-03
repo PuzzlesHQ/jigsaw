@@ -44,6 +44,10 @@ import net.fabricmc.loom.util.MirrorUtil;
 import java.util.Objects;
 
 public class LoomRepositoryPlugin implements Plugin<PluginAware> {
+	
+	static final String NORMAL_BASE = "dev.puzzleshq";
+	static final String JITPACK_BASE = "com.github.PuzzlesHQ";
+	static String BASE = NORMAL_BASE;
 	@Override
 	public void apply(@NotNull PluginAware target) {
 		if (target instanceof Settings settings) {
@@ -82,19 +86,25 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		project.getDependencies().add("runtimeOnly", dep);
 	}
 
-	static ComparableVersion PUZZLE_VERSION_REFACTOR = new ComparableVersion("2.0.0");
-	static ComparableVersion PUZZLE_VERSION_PRE_BUNDLED = new ComparableVersion("2.1.16");
 
 	private void setupProjectDependencies(Project project) {
-		// Puzzle Loader
-		if (project.getProperties().get("puzzle_loader_version") != null) {
-			if (!project.getProperties().get("puzzle_loader_version").toString().contains("development"))
-				addImplSided(project, getPuzzleLoader((String) project.getProperties().get("puzzle_loader_version")));
+		// Puzzle Core
+		if (project.getProperties().get("use_jitpack") != null) {
+			if(project.getProperties().get("use_jitpack").equals("true") || project.getProperties().get("use_jitpack").equals(true)){
+				BASE = JITPACK_BASE;
+			}
 		}
-
+		if (project.getProperties().get("puzzle_core_version") != null) {
+			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+		}
 		// Puzzle Paradox
 		if (project.getProperties().get("puzzle_paradox_version") != null) {
 			addImpl(project, getPuzzleParadox((String) project.getProperties().get("puzzle_paradox_version")));
+		}
+		// Puzzle Cosmic
+		if (project.getProperties().get("puzzle_cosmic_version") != null) {
+			addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")));
 		}
 
 		// Access Manipulators
@@ -102,17 +112,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			addImpl(project, getAccessManipulators((String) project.getProperties().get("access_manipulators_version")));
 		}
 
-		if (project.getProperties().get("puzzle_loader_version") != null) {
-			ComparableVersion puzzleVersionString = new ComparableVersion(project.getProperties().get("puzzle_loader_version").toString());
-
-			if (
-					!(puzzleVersionString.compareTo(PUZZLE_VERSION_PRE_BUNDLED) > 0
-					|| "2.1.16".equals(project.getProperties().get("puzzle_loader_version").toString()))
-			) {
-				if (Objects.equals(project.getProperties().get("puzzle_loader_version").toString(), "development-fabric"))
-					addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
-				else if (Objects.equals(project.getProperties().get("puzzle_loader_version").toString(), "development-sponge"))
-					addImpl(project, "org.spongepowered:mixin:0.8.5");
+		if (project.getProperties().get("puzzle_core_version") != null) {
 
 				// Asm
 				addImpl(project, "org.ow2.asm:asm:9.6");
@@ -121,15 +121,11 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 				addImpl(project, "org.ow2.asm:asm-analysis:9.6");
 				addImpl(project, "org.ow2.asm:asm-commons:9.6");
 
-				if (project.getProperties().get("puzzle_loader_version").toString().contains("development")) return;
 
 				// Mixins
-				if (puzzleVersionString.compareTo(PUZZLE_VERSION_REFACTOR) > 0 || "2.0.0".equals(project.getProperties().get("puzzle_loader_version").toString()))
-					addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
-				else
-					addImpl(project, "org.spongepowered:mixin:0.8.5");
-			}
+			   addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
 		}
+
 	}
 
 	private void declareRepositories(RepositoryHandler repositories, LoomFiles files, ExtensionAware target) {
@@ -287,11 +283,22 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * Gets the Maven formatted string to Puzzle Loader with the specified ${version}
 	 * @param ver Version of PuzzleLoader
 	 * @return Gradle dependency ready formatted string
-	 * @since 1.0.0
+	 * @since 1.2.0
 	 */
-	static String getPuzzleLoader(String ver) {
-		return "com.github.PuzzlesHQ:PuzzleLoader:" + ver;
+	static String getPuzzleCore(String ver) {
+		return BASE + ":puzzle-loader-corer:" + ver;
 	}
+
+	/**
+	 * Gets the Maven formatted string to Puzzle Loader with the specified ${version}
+	 * @param ver Version of PuzzleLoader
+	 * @return Gradle dependency ready formatted string
+	 * @since 1.2.0
+	 */
+	static String getPuzzleCosmic(String ver) {
+		return BASE + ":puzzle-loader-cosmic:" + ver;
+	}
+
 
 	/**
 	 * Gets the Maven formatted string to Access Manipulators with the specified ${version}
@@ -300,6 +307,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * @since 1.0.0
 	 */
 	static String getAccessManipulators(String ver) {
-		return "com.github.PuzzlesHQ:access_manipulators:" + ver;
+		return "dev.puzzleshq:access_manipulators:" + ver;
 	}
+
 }

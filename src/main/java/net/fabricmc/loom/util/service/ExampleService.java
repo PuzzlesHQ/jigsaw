@@ -68,7 +68,6 @@ public final class ExampleService extends Service<ExampleService.Options> implem
 	public void doSomething() {
 		// The service factory used to the creation the current service can be used to get or create other services based on the current service's options.
 		AnotherService another = getServiceFactory().get(getOptions().getNested());
-		System.out.println("ExampleService: " + another.getExample());
 	}
 
 	@Override

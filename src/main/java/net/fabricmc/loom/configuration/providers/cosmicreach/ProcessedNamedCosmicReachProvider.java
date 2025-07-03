@@ -82,7 +82,6 @@ public abstract class ProcessedNamedCosmicReachProvider<M extends CosmicReachPro
 
 	private void processJars(Map<CosmicReachJar, CosmicReachJar> minecraftJarMap, ConfigContext configContext) throws IOException {
 
-		System.out.println(jarProcessorManager.jarProcessors.size());
 		for (Map.Entry<CosmicReachJar, CosmicReachJar> entry : minecraftJarMap.entrySet()) {
 			final CosmicReachJar minecraftJar = entry.getKey();
 			final CosmicReachJar outputJar = entry.getValue();

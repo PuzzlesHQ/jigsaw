@@ -83,8 +83,6 @@ public record SpecContextImpl(List<PuzzleModJson> modDependencies, List<PuzzleMo
 
 				if (!fabricModJson.isEmpty()) {
 					mods.add(fabricModJson.get(0));
-				}else{
-					System.out.println("nod Mod json ");
 				}
 			}
 		}

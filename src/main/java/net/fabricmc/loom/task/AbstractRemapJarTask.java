@@ -78,6 +78,7 @@ public abstract class AbstractRemapJarTask extends Jar {
 	@Input
 	public abstract Property<String> getSourceNamespace();
 
+	@Optional
 	@Input
 	public abstract Property<String> getTargetNamespace();
 
