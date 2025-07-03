@@ -286,7 +286,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * @since 1.2.0
 	 */
 	static String getPuzzleCore(String ver) {
-		return BASE + ":puzzle-loader-corer:" + ver;
+		return BASE + ":puzzle-loader-core:" + ver;
 	}
 
 	/**
