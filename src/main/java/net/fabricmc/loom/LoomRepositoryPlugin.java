@@ -283,7 +283,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * Gets the Maven formatted string to Puzzle Loader with the specified ${version}
 	 * @param ver Version of PuzzleLoader
 	 * @return Gradle dependency ready formatted string
-	 * @since 1.2.1
+	 * @since 1.2.0
 	 */
 	static String getPuzzleCore(String ver) {
 		return BASE + ":puzzle-loader-corer:" + ver;
@@ -293,7 +293,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	 * Gets the Maven formatted string to Puzzle Loader with the specified ${version}
 	 * @param ver Version of PuzzleLoader
 	 * @return Gradle dependency ready formatted string
-	 * @since 1.2.1
+	 * @since 1.2.0
 	 */
 	static String getPuzzleCosmic(String ver) {
 		return BASE + ":puzzle-loader-cosmic:" + ver;
