@@ -5,6 +5,7 @@ asm = "9.7.1"
 commons-io = "2.15.1"
 gson = "2.10.1"
 guava = "33.0.0-jre"
+hjson = "3.1.0"
 
 stitch = "0.6.2"
 tiny-remapper = "0.10.4"
@@ -32,6 +33,7 @@ asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+hjson = { module = "org.hjson:hjson", version.ref = "hjson" }
 
 fabric-stitch = { module = "net.fabricmc:stitch", version.ref = "stitch" }
 fabric-tiny-remapper = { module = "net.fabricmc:tiny-remapper", version.ref = "tiny-remapper" }

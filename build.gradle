@@ -111,7 +111,7 @@ dependencies {
 	implementation("com.github.PuzzleLoader:access_manipulators:${access_manipulators_version}")
 	implementation("org.apache.maven:maven-artifact:3.6.3")
 
-	shadow("com.github.johnrengelman:shadow:8.1.1")
+	shadow("com.gradleup.shadow:shadow-gradle-plugin:8.3.8")
 
 	bootstrap project(":bootstrap")
 
@@ -120,6 +120,7 @@ dependencies {
 	implementation libs.gson
 	implementation libs.guava
 	implementation libs.bundles.asm
+	implementation libs.hjson
 
 	// game handling utils
 	implementation (libs.fabric.stitch) {

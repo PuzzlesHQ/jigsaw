@@ -24,6 +24,7 @@
 
 package net.fabricmc.loom;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -36,17 +37,30 @@ import org.gradle.api.initialization.Settings;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.PluginAware;
+import org.hjson.JsonArray;
+import org.hjson.JsonObject;
+import org.hjson.JsonValue;
+import org.hjson.Stringify;
 import org.jetbrains.annotations.NotNull;
 
 import net.fabricmc.loom.extension.LoomFiles;
 import net.fabricmc.loom.util.MirrorUtil;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Stream;
+
+import static org.gradle.internal.impldep.org.junit.Assert.assertTrue;
 
 public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	
 	static final String NORMAL_BASE = "dev.puzzleshq";
 	static final String JITPACK_BASE = "com.github.PuzzlesHQ";
+	static final String VERSION_MANIFEST_CORE_LOC = "https://raw.githubusercontent.com/PuzzlesHQ/puzzle-loader-core/refs/heads/versioning/versions.json";
+	static final String VERSION_MANIFEST_COSMIC_LOC = "https://raw.githubusercontent.com/PuzzlesHQ/puzzle-loader-cosmic/refs/heads/versioning/versions.json";
 	static String BASE = NORMAL_BASE;
 	@Override
 	public void apply(@NotNull PluginAware target) {
@@ -86,6 +100,80 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		project.getDependencies().add("runtimeOnly", dep);
 	}
 
+	private void pullDeps(Project project,String propertiesVersion, URL url){
+		try {
+
+			var stream = url.openStream();
+			String jsonInfo = new String(stream.readAllBytes());
+			stream.close();
+
+			JsonObject obj = JsonValue.readHjson(jsonInfo).asObject();
+			var versionsList = obj.get("versions").asObject();
+			JsonObject versionInfo = versionsList.get((String)project.getProperties().get(propertiesVersion)).asObject();
+			if(versionInfo == null){
+				versionInfo = versionsList.get(obj.get("latest").asObject().get("*").asString()).asObject();
+				assertTrue(ObjectUtils.allNotNull(versionInfo));
+			}
+			var depsUrl = new URL(versionInfo.get("dependencies").asString());
+
+			stream =  depsUrl.openStream();
+			String jsonDepsInfoString =  new String(stream.readAllBytes());
+			stream.close();
+
+			JsonObject depsobj = JsonValue.readHjson(jsonDepsInfoString).asObject();
+
+
+			if( depsobj.get("common") != null) {
+				JsonArray commonDepsList = depsobj.get("common").asArray();
+				for (JsonValue jsonValue : commonDepsList) {
+					var depobj = jsonValue.asObject();
+					if (Objects.equals(depobj.get("type").asString(), "implementation")) {
+						String dep = String.format("%s:%s:%s",
+								depobj.get("groupId").asString(),
+								depobj.get("artifactId").asString(),
+								depobj.get("version").asString()
+						);
+						addImpl(project, dep);
+
+					}
+				}
+			}
+			if(depsobj.get("common") != null) {
+				JsonArray client = depsobj.get("common").asArray();
+
+				for (JsonValue jsonValue : client) {
+					var depobj = jsonValue.asObject();
+					if (Objects.equals(depobj.get("type").asString(), "implementation")) {
+						String dep = String.format("%s:%s:%s",
+								depobj.get("groupId").asString(),
+								depobj.get("artifactId").asString(),
+								depobj.get("version").asString()
+						);
+						addImpl(project, dep);
+
+					}
+				}
+			}
+
+			if(depsobj.get("server") != null) {
+				JsonArray server = depsobj.get("server").asArray();
+				for (JsonValue jsonValue : server) {
+					var depobj = jsonValue.asObject();
+					if (Objects.equals(depobj.get("type").asString(), "implementation")) {
+						String dep = String.format("%s:%s:%s",
+								depobj.get("groupId").asString(),
+								depobj.get("artifactId").asString(),
+								depobj.get("version").asString()
+						);
+						addImpl(project, dep);
+
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	private void setupProjectDependencies(Project project) {
 		// Puzzle Core
@@ -95,8 +183,15 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			}
 		}
 		if (project.getProperties().get("puzzle_core_version") != null) {
-			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")));
-//			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+			try {
+				pullDeps(project,"puzzle_core_version", new URL(VERSION_MANIFEST_CORE_LOC));
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+
+////			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 		}
 		// Puzzle Paradox
 		if (project.getProperties().get("puzzle_paradox_version") != null) {
@@ -104,27 +199,35 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 		// Puzzle Cosmic
 		if (project.getProperties().get("puzzle_cosmic_version") != null) {
-			addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")));
+			addImplSided(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")));
+			try {
+				pullDeps(project,"puzzle_cosmic_version", new URL(VERSION_MANIFEST_COSMIC_LOC));
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		// Access Manipulators
 		if (project.getProperties().get("access_manipulators_version") != null) {
 			addImpl(project, getAccessManipulators((String) project.getProperties().get("access_manipulators_version")));
 		}
-
-		if (project.getProperties().get("puzzle_core_version") != null) {
-
-				// Asm
-				addImpl(project, "org.ow2.asm:asm:9.6");
-				addImpl(project, "org.ow2.asm:asm-tree:9.6");
-				addImpl(project, "org.ow2.asm:asm-util:9.6");
-				addImpl(project, "org.ow2.asm:asm-analysis:9.6");
-				addImpl(project, "org.ow2.asm:asm-commons:9.6");
-
-
-				// Mixins
-			   addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
-		}
+//
+//		if (project.getProperties().get("puzzle_core_version") != null) {
+//
+//				// Asm
+////				addImpl(project, "org.ow2.asm:asm:9.8");
+////				addImpl(project, "org.ow2.asm:asm-tree:9.8");
+////				addImpl(project, "org.ow2.asm:asm-util:9.8");
+////				addImpl(project, "org.ow2.asm:asm-analysis:9.8");
+////				addImpl(project, "org.ow2.asm:asm-commons:9.8");
+////				addImpl(project, "net.neoforged:bus:8.0.2");
+//
+//
+//				// Mixins
+////			   addImpl(project, "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7");
+////			   addImpl(project, "io.github.llamalad7:mixinextras-fabric:0.4.1");
+//
+//		}
 
 	}
 
