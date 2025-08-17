@@ -98,9 +98,13 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	public void addImpl(Project project, String dep) {
 		project.getDependencies().add("compileOnly", dep);
 		project.getDependencies().add("runtimeOnly", dep);
+		if (project.getConfigurations().findByName("clientCompileOnly") != null) {
+			project.getDependencies().add("clientCompileOnly", dep);
+			project.getDependencies().add("clientRuntimeOnly", dep);
+		}
 	}
 
-	private void pullDeps(Project project,String propertiesVersion, URL url){
+	private void pullDeps(Project project, String propertiesVersion, URL url){
 		try {
 
 			var stream = url.openStream();
@@ -122,8 +126,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 
 			JsonObject depsobj = JsonValue.readHjson(jsonDepsInfoString).asObject();
 
-
-			if( depsobj.get("common") != null) {
+			if(depsobj.get("common") != null) {
 				JsonArray commonDepsList = depsobj.get("common").asArray();
 				for (JsonValue jsonValue : commonDepsList) {
 					var depobj = jsonValue.asObject();
@@ -134,23 +137,6 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 								depobj.get("version").asString()
 						);
 						addImpl(project, dep);
-
-					}
-				}
-			}
-			if(depsobj.get("common") != null) {
-				JsonArray client = depsobj.get("common").asArray();
-
-				for (JsonValue jsonValue : client) {
-					var depobj = jsonValue.asObject();
-					if (Objects.equals(depobj.get("type").asString(), "implementation")) {
-						String dep = String.format("%s:%s:%s",
-								depobj.get("groupId").asString(),
-								depobj.get("artifactId").asString(),
-								depobj.get("version").asString()
-						);
-						addImpl(project, dep);
-
 					}
 				}
 			}
@@ -166,7 +152,6 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 								depobj.get("version").asString()
 						);
 						addImpl(project, dep);
-
 					}
 				}
 			}
@@ -184,7 +169,7 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 		if (project.getProperties().get("puzzle_core_version") != null) {
 			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
-			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 			try {
 				pullDeps(project,"puzzle_core_version", new URL(VERSION_MANIFEST_CORE_LOC));
 			} catch (MalformedURLException e) {
