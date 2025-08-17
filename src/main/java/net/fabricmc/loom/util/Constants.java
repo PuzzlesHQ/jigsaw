@@ -99,8 +99,8 @@ public class Constants {
 	}
 
 	public static final class Knot {
-		public static final String KNOT_CLIENT = "com.github.puzzle.core.loader.launch.pieces.ClientPiece";
-		public static final String KNOT_SERVER = "com.github.puzzle.core.loader.launch.pieces.ServerPiece";
+		public static final String KNOT_CLIENT = "dev.puzzleshq.puzzleloader.loader.launch.pieces.ClientPiece";
+		public static final String KNOT_SERVER = "dev.puzzleshq.puzzleloader.loader.launch.pieces.ServerPiece";
 
 		public static final String QKNOT_CLIENT = "dev.crmodders.cosmicquilt.loader.knot.KnotClient";
 		public static final String QKNOT_SERVER = "dev.crmodders.cosmicquilt.loader.knot.KnotServer";
