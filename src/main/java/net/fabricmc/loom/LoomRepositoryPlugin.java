@@ -85,23 +85,17 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 
 	public void addImplSided(Project project, String dep) {
 		if (project.getConfigurations().findByName("clientCompileOnly") != null) {
-			project.getDependencies().add("clientCompileOnly", dep + ":client");
-			project.getDependencies().add("clientRuntimeOnly", dep + ":client");
-			project.getDependencies().add("compileOnly", dep + ":server");
-			project.getDependencies().add("runtimeOnly", dep + ":server");
+			project.getDependencies().add("clientCompileOnly", dep);
+			project.getDependencies().add("clientRuntimeOnly", dep);
 		} else {
-			project.getDependencies().add("compileOnly", dep + ":client");
-			project.getDependencies().add("runtimeOnly", dep + ":client");
+			project.getDependencies().add("compileOnly", dep);
+			project.getDependencies().add("runtimeOnly", dep);
 		}
 	}
 
 	public void addImpl(Project project, String dep) {
 		project.getDependencies().add("compileOnly", dep);
 		project.getDependencies().add("runtimeOnly", dep);
-		if (project.getConfigurations().findByName("clientCompileOnly") != null) {
-			project.getDependencies().add("clientCompileOnly", dep);
-			project.getDependencies().add("clientRuntimeOnly", dep);
-		}
 	}
 
 	private void pullDeps(Project project, String propertiesVersion, URL url){
@@ -168,15 +162,17 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			}
 		}
 		if (project.getProperties().get("puzzle_core_version") != null) {
-			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
-			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+			if (project.getConfigurations().findByName("clientCompileOnly") != null) {
+				addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+			} else {
+				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+			}
 			try {
 				pullDeps(project,"puzzle_core_version", new URL(VERSION_MANIFEST_CORE_LOC));
 			} catch (MalformedURLException e) {
 				throw new RuntimeException(e);
 			}
-
-////			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 		}
 		// Puzzle Paradox
 		if (project.getProperties().get("puzzle_paradox_version") != null) {
@@ -184,7 +180,12 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 		// Puzzle Cosmic
 		if (project.getProperties().get("puzzle_cosmic_version") != null) {
-			addImplSided(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")));
+			if (project.getConfigurations().findByName("clientCompileOnly") != null) {
+				addImplSided(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
+				addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":server");
+			} else {
+				addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
+			}
 			try {
 				pullDeps(project,"puzzle_cosmic_version", new URL(VERSION_MANIFEST_COSMIC_LOC));
 			} catch (MalformedURLException e) {
