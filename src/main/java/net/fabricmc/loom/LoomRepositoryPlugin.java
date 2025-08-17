@@ -24,19 +24,29 @@
 
 package net.fabricmc.loom;
 
+import groovy.lang.Closure;
+
+import net.fabricmc.loom.configuration.LoomConfigurations;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ArtifactRepositoryContainer;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.ExcludeRule;
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
 import org.gradle.api.artifacts.repositories.ArtifactRepository;
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository;
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
 import org.gradle.api.initialization.Settings;
+import org.gradle.api.internal.artifacts.DefaultExcludeRule;
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.PluginAware;
+import org.gradle.api.publish.maven.internal.dependencies.DefaultMavenDependency;
 import org.hjson.JsonArray;
 import org.hjson.JsonObject;
 import org.hjson.JsonValue;
@@ -50,6 +60,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -84,18 +95,22 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	}
 
 	public void addImplSided(Project project, String dep) {
-		if (project.getConfigurations().findByName("clientCompileOnly") != null) {
-			project.getDependencies().add("clientCompileOnly", dep);
-			project.getDependencies().add("clientRuntimeOnly", dep);
+		if (project.getConfigurations().findByName("clientImplementation") != null) {
+			project.getDependencies().add("clientImplementation", dep);
 		} else {
-			project.getDependencies().add("compileOnly", dep);
-			project.getDependencies().add("runtimeOnly", dep);
+			project.getDependencies().add("implementation", dep);
 		}
 	}
 
 	public void addImpl(Project project, String dep) {
-		project.getDependencies().add("compileOnly", dep);
-		project.getDependencies().add("runtimeOnly", dep);
+		if (dep.contains("net.neoforged:bus")) {
+			((DefaultExternalModuleDependency)project.getDependencies().add("implementation", dep)).exclude(new HashMap<String, String>(){{
+				put("group", "org.apache.logging.log4j");
+				put("module", "log4j-api");
+			}});
+		} else {
+			project.getDependencies().add("implementation", dep);
+		}
 	}
 
 	private void pullDeps(Project project, String propertiesVersion, URL url){
@@ -162,10 +177,11 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			}
 		}
 		if (project.getProperties().get("puzzle_core_version") != null) {
-			if (project.getConfigurations().findByName("clientCompileOnly") != null) {
+			if (project.getConfigurations().findByName("clientImplementation") != null) {
 				addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
 			} else {
+				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
 			}
 			try {
@@ -180,9 +196,10 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 		// Puzzle Cosmic
 		if (project.getProperties().get("puzzle_cosmic_version") != null) {
+			addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":common");
+			addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":server");
 			if (project.getConfigurations().findByName("clientCompileOnly") != null) {
 				addImplSided(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
-				addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":server");
 			} else {
 				addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
 			}

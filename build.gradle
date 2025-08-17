@@ -24,7 +24,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 	}
 }
 
-group = 'com.github.PuzzlesHQ'
+group = 'dev.puzzleshq'
 def baseVersion = '1.8'
 
 def ENV = System.getenv()
