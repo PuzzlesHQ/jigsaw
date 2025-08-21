@@ -218,7 +218,6 @@ import org.w3c.dom.Node
 
 publishing {
 	publications {
-		if (!ENV.EXPERIMENTAL) {
 			// Also publish a snapshot so people can use the latest version if they wish
 			snapshot(MavenPublication) { publication ->
 				groupId project.group
@@ -246,7 +245,6 @@ publishing {
 					version.setTextContent(baseVersion + '-SNAPSHOT')
 				})
 			}
-		}
 	}
 	repositories {
 		maven {
