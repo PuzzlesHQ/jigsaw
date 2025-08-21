@@ -24,19 +24,19 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 	}
 }
 
-group = 'dev.puzzleshq'
-def baseVersion = '1.8'
-
+group = 'com.github.PuzzlesHQ'
+//def baseVersion = '1.8'
+//
 def ENV = System.getenv()
-if (ENV.BUILD_NUMBER) {
-	if (ENV.EXPERIMENTAL) {
-		version = baseVersion + '.0-alpha.' + ENV.BUILD_NUMBER
-	} else {
-		version = baseVersion + '.' + ENV.BUILD_NUMBER
-	}
-} else {
-	version = baseVersion + '.local'
-}
+//if (ENV.BUILD_NUMBER) {
+//	if (ENV.EXPERIMENTAL) {
+//		version = baseVersion + '.0-alpha.' + ENV.BUILD_NUMBER
+//	} else {
+//		version = baseVersion + '.' + ENV.BUILD_NUMBER
+//	}
+//} else {
+//	version = baseVersion + '.local'
+//}
 
 // We must build against the version of Kotlin Gradle ships with.
 def props = new Properties()
@@ -223,7 +223,6 @@ publishing {
 			snapshot(MavenPublication) { publication ->
 				groupId project.group
 				artifactId project.base.archivesName.get()
-				version baseVersion + '-SNAPSHOT'
 
 				from components.java
 			}
@@ -232,7 +231,6 @@ publishing {
 			snapshotPlugin(MavenPublication) { publication ->
 				groupId 'com.github.PuzzlesHQ'
 				artifactId 'jigsaw'
-				version baseVersion + '-SNAPSHOT'
 
 				pom.withXml({
 					// Based off org.gradle.plugin.devel.plugins.MavenPluginPublishPlugin
