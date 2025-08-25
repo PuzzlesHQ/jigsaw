@@ -220,7 +220,6 @@ publishing {
 	publications {
 			// Also publish a snapshot so people can use the latest version if they wish
 			snapshot(MavenPublication) { publication ->
-				groupId project.group
 				groupId 'com.github.PuzzlesHQ'
 				artifactId  'jigsaw'
 
