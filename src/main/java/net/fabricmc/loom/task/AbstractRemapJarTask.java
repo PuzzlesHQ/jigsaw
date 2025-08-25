@@ -177,6 +177,8 @@ public abstract class AbstractRemapJarTask extends Jar {
 		RegularFileProperty getOutputFile();
 
 		Property<String> getSourceNamespace();
+
+		@Optional
 		Property<String> getTargetNamespace();
 
 		/**

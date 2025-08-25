@@ -221,7 +221,8 @@ publishing {
 			// Also publish a snapshot so people can use the latest version if they wish
 			snapshot(MavenPublication) { publication ->
 				groupId project.group
-				artifactId project.base.archivesName.get()
+				groupId 'com.github.PuzzlesHQ'
+				artifactId  'jigsaw'
 
 				from components.java
 			}
