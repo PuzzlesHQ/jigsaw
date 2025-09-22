@@ -102,12 +102,22 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 	}
 
+	private static HashMap<String, String> createExclude(String group, String module) {
+		return new HashMap<>(){{
+			put("group", group);
+			put("module", module);
+		}};
+	}
+
 	public void addImpl(Project project, String dep) {
 		if (dep.contains("net.neoforged:bus")) {
-			((DefaultExternalModuleDependency)project.getDependencies().add("implementation", dep)).exclude(new HashMap<String, String>(){{
-				put("group", "org.apache.logging.log4j");
-				put("module", "log4j-api");
-			}});
+			DefaultExternalModuleDependency dependency = ((DefaultExternalModuleDependency)project.getDependencies().add("implementation", dep));
+			dependency.exclude(createExclude("org.apache.logging.log4j", "log4j-api"));
+			dependency.exclude(createExclude("org.apache.logging.log4j", "log4j-core"));
+		} else if (dep.contains("net.fabricmc:sponge-mixin")) {
+			DefaultExternalModuleDependency dependency = ((DefaultExternalModuleDependency)project.getDependencies().add("implementation", dep));
+			dependency.exclude(createExclude("com.google.code.gson", "gson"));
+			dependency.exclude(createExclude("com.google.guava", "guava"));
 		} else {
 			project.getDependencies().add("implementation", dep);
 		}
@@ -180,9 +190,11 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			if (project.getConfigurations().findByName("clientImplementation") != null) {
 				addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":server");
 			} else {
 				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
 				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":server");
 			}
 			try {
 				pullDeps(project,"puzzle_core_version", new URL(VERSION_MANIFEST_CORE_LOC));
