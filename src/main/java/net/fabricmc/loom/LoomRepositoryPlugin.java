@@ -112,10 +112,12 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	public void addImpl(Project project, String dep) {
 		if (dep.contains("net.neoforged:bus")) {
 			DefaultExternalModuleDependency dependency = ((DefaultExternalModuleDependency)project.getDependencies().add("implementation", dep));
+			assert dependency != null;
 			dependency.exclude(createExclude("org.apache.logging.log4j", "log4j-api"));
 			dependency.exclude(createExclude("org.apache.logging.log4j", "log4j-core"));
 		} else if (dep.contains("net.fabricmc:sponge-mixin")) {
 			DefaultExternalModuleDependency dependency = ((DefaultExternalModuleDependency)project.getDependencies().add("implementation", dep));
+			assert dependency != null;
 			dependency.exclude(createExclude("com.google.code.gson", "gson"));
 			dependency.exclude(createExclude("com.google.guava", "guava"));
 		} else {
@@ -187,15 +189,9 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			}
 		}
 		if (project.getProperties().get("puzzle_core_version") != null) {
-			if (project.getConfigurations().findByName("clientImplementation") != null) {
-				addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
-				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
-				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":server");
-			} else {
-				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
-				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
-				addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":server");
-			}
+			addImplSided(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":client");
+			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":common");
+			addImpl(project, getPuzzleCore((String) project.getProperties().get("puzzle_core_version")) + ":server");
 			try {
 				pullDeps(project,"puzzle_core_version", new URL(VERSION_MANIFEST_CORE_LOC));
 			} catch (MalformedURLException e) {
@@ -208,13 +204,9 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 		}
 		// Puzzle Cosmic
 		if (project.getProperties().get("puzzle_cosmic_version") != null) {
+			addImplSided(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
 			addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":common");
 			addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":server");
-			if (project.getConfigurations().findByName("clientCompileOnly") != null) {
-				addImplSided(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
-			} else {
-				addImpl(project, getPuzzleCosmic((String) project.getProperties().get("puzzle_cosmic_version")) + ":client");
-			}
 			try {
 				pullDeps(project,"puzzle_cosmic_version", new URL(VERSION_MANIFEST_COSMIC_LOC));
 			} catch (MalformedURLException e) {
