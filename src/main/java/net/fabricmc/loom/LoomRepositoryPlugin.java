@@ -24,47 +24,34 @@
 
 package net.fabricmc.loom;
 
-import groovy.lang.Closure;
+import static org.gradle.internal.impldep.org.junit.Assert.assertTrue;
 
-import net.fabricmc.loom.configuration.LoomConfigurations;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.maven.artifact.versioning.ComparableVersion;
-import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ArtifactRepositoryContainer;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ExcludeRule;
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
 import org.gradle.api.artifacts.repositories.ArtifactRepository;
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository;
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
 import org.gradle.api.initialization.Settings;
-import org.gradle.api.internal.artifacts.DefaultExcludeRule;
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.PluginAware;
-import org.gradle.api.publish.maven.internal.dependencies.DefaultMavenDependency;
 import org.hjson.JsonArray;
 import org.hjson.JsonObject;
 import org.hjson.JsonValue;
-import org.hjson.Stringify;
 import org.jetbrains.annotations.NotNull;
 
 import net.fabricmc.loom.extension.LoomFiles;
 import net.fabricmc.loom.util.MirrorUtil;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import static org.gradle.internal.impldep.org.junit.Assert.assertTrue;
 
 public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 	
@@ -146,6 +133,19 @@ public class LoomRepositoryPlugin implements Plugin<PluginAware> {
 			stream.close();
 
 			JsonObject depsobj = JsonValue.readHjson(jsonDepsInfoString).asObject();
+			var repos =  project.getRepositories();
+			if(depsobj.get("repos") != null){
+				JsonArray reposList = depsobj.get("repos").asArray();
+				for (JsonValue jsonValue : reposList) {
+					var repoobj = jsonValue.asObject();
+					String repourl = repoobj.get("url").asString();
+					String repoName = repoobj.get("name").asString();
+					repos.maven(repo -> {
+						repo.setName(repoName);
+						repo.setUrl(repourl);
+					});
+				}
+			}
 
 			if(depsobj.get("common") != null) {
 				JsonArray commonDepsList = depsobj.get("common").asArray();
